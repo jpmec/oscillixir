@@ -4,10 +4,12 @@ defmodule Sequence.Timer.Server do
   """
   use GenServer
 
+  defstruct server: :nil, event: :nil
+
   def new(interval_ms \\ 1000, start_t \\ 0, increment \\ 1) do
     {:ok, event_pid} = GenEvent.start_link([])
     {:ok, pid} = GenServer.start_link(__MODULE__, {start_t, interval_ms, increment, :nil, event_pid})
-    {:ok, pid, event_pid}
+    {:ok, %Sequence.Timer.Server{server: pid, event: event_pid}}
   end
 
   def start(pid) do
@@ -61,7 +63,7 @@ defmodule Sequence.Timer.Server do
   end
 
   def handle_call(:get, _from, {t, interval, increment, tref, event_pid}) do
-    {:reply, {:ok, t}, {t, interval, increment, tref, event_pid}}
+    {:reply, t, {t, interval, increment, tref, event_pid}}
   end
 
   def handle_call(:event_pid, _from, {t, interval, increment, tref, event_pid}) do
@@ -70,8 +72,8 @@ defmodule Sequence.Timer.Server do
 
   def handle_call(:next, _from, {t, interval, increment, tref, event_pid}) do
     t = t + increment
-    GenEvent.notify(event_pid, {:t, t})
-    {:reply, {:ok, t}, {t, interval, increment, tref, event_pid}}
+    GenEvent.notify(event_pid, t)
+    {:reply, t, {t, interval, increment, tref, event_pid}}
   end
 
   def handle_call(:started?, _from, {t, interval, increment, tref, event_pid}) do
