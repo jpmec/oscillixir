@@ -24,28 +24,17 @@ defmodule Oscillixir do
   # A simple example of chaining time source, oscillator, and filters
   def new do
 
-    {:ok, timer} = Source.Timer.new(1000)
-    {:ok, range} = Sequence.Range.new(3)
-    {:ok, gain} = Filter.Gain.new(0.0)
-
+    {:ok, timer} = Source.Timer.new(10)
+    {:ok, range} = Sequence.Range.new()
 
     timer |> connect(range)
 
     range
-      |> connect(Oscillator.Sine.new())
-      |> connect(Filter.Bias.new(0.5))
-      |> connect(Filter.Gain.new(10000.0))
-      |> connect(gain, :gain)
-
-    range
       |> connect(Oscillator.Square.new())
-      |> connect(Filter.Linear.new(0.5, 0.5))
-      |> connect(gain)
+      |> connect(Filter.Gain.new(127.0))
       |> connect(Filter.Lowpass.new(0.5))
-      |> connect(Filter.Gate.new(5.0))
-      |> connect(Filter.Limit.new(0.0, 65535.0))
       |> connect(Filter.Round.new())
-      |> connect(Sink.Inspect.new())
+      |> connect(Sink.File.new())
 
     Source.Timer.start(timer.server)
 

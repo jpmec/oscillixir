@@ -26,15 +26,12 @@ defmodule Filter.Lowpass do
     GenServer.call(pid, {:set, input})
   end
 
-  def call(input, {y, alpha}) do
-    z = y + alpha * (input - y)
-    {z, z}
-  end
+  def handle_call({:get, input}, _from, {{y, alpha}, event_pid}) do
+    output = y + alpha * (input - y)
 
-  def handle_call({:get, input}, _from, {state, event_pid}) do
-    {output, _} = __MODULE__.call(input, state)
     GenEvent.notify(event_pid, output)
-    {:reply, output, {state, event_pid}}
+
+    {:reply, output, {{output, alpha}, event_pid}}
   end
 
 end

@@ -13,23 +13,24 @@ defmodule Sink.Inspect do
   end
 
   def new(preamble \\ :nil) do
-    {:ok, pid} = GenServer.start_link(__MODULE__, {{preamble}, :nil})
-    {:ok, %Sink.Inspect{server: pid, event: :nil, input: Sink.Inspect.InputHandler}}
+    {:ok, event_pid} = GenEvent.start_link([])
+    {:ok, pid} = GenServer.start_link(__MODULE__, {{preamble}, :event_pid})
+    {:ok, %__MODULE__{server: pid, event: :event_pid, input: __MODULE__.InputHandler}}
   end
 
   def inspect(pid, input) do
     GenServer.call(pid, {:inspect, input})
   end
 
-  def handle_call({:inspect, input}, _from, {{:nil}, :nil}) do
+  def handle_call({:inspect, input}, _from, {{:nil}, :event_pid}) do
     IO.inspect(input)
-    {:reply, :ok, {{:nil}, :nil}}
+    {:reply, :ok, {{:nil}, :event_pid}}
   end
 
-  def handle_call({:inspect, input}, _from, {{preamble}, :nil}) do
+  def handle_call({:inspect, input}, _from, {{preamble}, :event_pid}) do
     IO.inspect(preamble)
     IO.inspect(input)
-    {:reply, :ok, {{preamble}, :nil}}
+    {:reply, :ok, {{preamble}, :event_pid}}
   end
 
 end
