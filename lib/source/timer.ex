@@ -1,6 +1,9 @@
-defmodule Sequence.Timer.Server do
+defmodule Source.Timer do
   @moduledoc """
   Generate a sequence of incrementing values at each timer interval.
+
+  The interval is specified in milliseconds.
+  The smallest timer interval is 1 millisecond.
   """
   use GenServer
 
@@ -9,7 +12,7 @@ defmodule Sequence.Timer.Server do
   def new(interval_ms \\ 1000, start_t \\ 0, increment \\ 1) do
     {:ok, event_pid} = GenEvent.start_link([])
     {:ok, pid} = GenServer.start_link(__MODULE__, {start_t, interval_ms, increment, :nil, event_pid})
-    {:ok, %Sequence.Timer.Server{server: pid, event: event_pid}}
+    {:ok, %Source.Timer{server: pid, event: event_pid}}
   end
 
   def start(pid) do
@@ -45,7 +48,7 @@ defmodule Sequence.Timer.Server do
     {:reply, {:ok, t, interval, increment, tref, event_pid}, {t, interval, increment, tref, event_pid}}
   end
 
-  def handle_call({:start, pid}, _from, {t, interval, increment, tref, event_pid}) do
+  def handle_call({:start, _}, _from, {t, interval, increment, tref, event_pid}) do
     {:reply, {:ok, t, interval, increment, tref, event_pid}, {t, interval, increment, tref, event_pid}}
   end
 
