@@ -1,16 +1,18 @@
-defmodule Oscillator.Saw do
+defmodule Oscillator.Triangle do
   use GenServer
 
   defstruct server: :nil, event: :nil, input: :nil
+
 
   defmodule InputHandler do
     use GenEvent
 
     def handle_event(t, {pid}) do
-      Oscillator.Saw.get(pid, t)
+      Oscillator.Triangle.get(pid, t)
       {:ok, {pid}}
     end
   end
+
 
   def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0) do
 
@@ -21,9 +23,11 @@ defmodule Oscillator.Saw do
     {:ok, %__MODULE__{server: pid, event: event_pid, input: __MODULE__.InputHandler}}
   end
 
+
   def get(pid, t) do
     GenServer.call(pid, {:get, t})
   end
+
 
   def call(input, {amplitude, frequency, phase, period, x}) do
     t = input - x
@@ -33,10 +37,18 @@ defmodule Oscillator.Saw do
       t = input - x
     end
 
-    y = -amplitude + (t * 2.0 * amplitude * frequency)
+    half_period = period / 2.0
 
-    {y, {amplitude, frequency, phase, period, x}}
+    if (t < half_period) do
+      y = -amplitude + (t * 4.0 * amplitude * frequency)
+      {y, {amplitude, frequency, phase, period, x}}
+    else
+      t = t - half_period
+      y = amplitude - (t * 4.0 * amplitude * frequency)
+      {y, {amplitude, frequency, phase, period, x}}
+    end
   end
+
 
   def handle_call({:get, input}, _from, {state, event_pid}) do
     {output, new_state} = __MODULE__.call(input, state)

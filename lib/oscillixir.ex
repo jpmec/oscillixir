@@ -30,9 +30,10 @@ defmodule Oscillixir do
     timer |> connect(range)
 
     range
-      |> connect(Oscillator.Saw.new(127.0))
+      |> connect(Oscillator.Triangle.new(127.0))
       |> connect(Filter.Round.new())
       |> connect(Sink.File.new())
+#      |> connect(Sink.Inspect.new())
 
 
     # range
