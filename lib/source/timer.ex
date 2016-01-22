@@ -9,7 +9,7 @@ defmodule Source.Timer do
 
   defstruct server: :nil, event: :nil
 
-  def new(interval_ms \\ 1000, start_t \\ 0, increment \\ 1) do
+  def new(interval_ms \\ 10, start_t \\ 0, increment \\ 1) do
     {:ok, event_pid} = GenEvent.start_link([])
     {:ok, pid} = GenServer.start_link(__MODULE__, {start_t, interval_ms, increment, :nil, event_pid})
     {:ok, %Source.Timer{server: pid, event: event_pid}}
