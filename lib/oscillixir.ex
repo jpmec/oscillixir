@@ -30,11 +30,24 @@ defmodule Oscillixir do
     timer |> connect(range)
 
     range
-      |> connect(Oscillator.Square.new())
-      |> connect(Filter.Gain.new(127.0))
-      |> connect(Filter.Lowpass.new(0.5))
+      |> connect(Oscillator.Saw.new(127.0))
       |> connect(Filter.Round.new())
       |> connect(Sink.File.new())
+
+
+    # range
+    #   |> connect(Oscillator.Sine.new())
+    #   |> connect(Filter.Gain.new(127.0))
+    #   |> connect(Filter.Round.new())
+    #   |> connect(Sink.File.new())
+
+
+    # range
+    #   |> connect(Oscillator.Square.new())
+    #   |> connect(Filter.Gain.new(127.0))
+    #   |> connect(Filter.Lowpass.new(0.25))
+    #   |> connect(Filter.Round.new())
+    #   |> connect(Sink.File.new())
 
     Source.Timer.start(timer.server)
 
