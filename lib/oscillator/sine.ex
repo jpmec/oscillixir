@@ -1,39 +1,17 @@
 defmodule Oscillator.Sine do
-  use GenServer
 
-  defstruct server: :nil, event: :nil, input: :nil
+  use GenOscillator, Oscillator.Sine
 
-  defmodule InputHandler do
-    use GenEvent
-
-    def handle_event(t, {pid}) do
-      Oscillator.Sine.get(pid, t)
-      {:ok, {pid}}
-    end
-  end
 
   def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
-
-    state = {amplitude, frequency, phase, bias}
-
-    {:ok, event_pid} = GenEvent.start_link([])
-    {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
-    {:ok, %__MODULE__{server: pid, event: event_pid, input: __MODULE__.InputHandler}}
+    __MODULE__.init {amplitude, frequency, phase, bias}
   end
 
-  def get(pid, t) do
-    GenServer.call(pid, {:get, t})
-  end
 
   def call(input, {amplitude, frequency, phase, bias}) do
-    amplitude * :math.sin(:math.pi * 2 * frequency * input + phase) + bias
+    y = amplitude * :math.sin(:math.pi * 2 * frequency * input + phase) + bias
+
+    {y, {amplitude, frequency, phase, bias}}
   end
 
-  def handle_call({:get, input}, _from, {state, event_pid}) do
-    output = __MODULE__.call(input, state)
-
-    GenEvent.notify(event_pid, output)
-
-    {:reply, output, {state, event_pid}}
-  end
 end
