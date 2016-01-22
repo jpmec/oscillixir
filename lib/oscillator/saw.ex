@@ -12,9 +12,9 @@ defmodule Oscillator.Saw do
     end
   end
 
-  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0) do
+  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
 
-    state = {amplitude, frequency, phase, 1.0/frequency, phase}
+    state = {amplitude, frequency, phase, bias, 1.0/frequency, phase}
 
     {:ok, event_pid} = GenEvent.start_link([])
     {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
@@ -25,7 +25,7 @@ defmodule Oscillator.Saw do
     GenServer.call(pid, {:get, t})
   end
 
-  def call(input, {amplitude, frequency, phase, period, x}) do
+  def call(input, {amplitude, frequency, phase, bias, period, x}) do
     t = input - x
 
     if (t >= period) do
@@ -33,7 +33,7 @@ defmodule Oscillator.Saw do
       t = input - x
     end
 
-    y = -amplitude + (t * 2.0 * amplitude * frequency)
+    y = -amplitude + (t * 2.0 * amplitude * frequency) + bias
 
     {y, {amplitude, frequency, phase, period, x}}
   end

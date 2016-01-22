@@ -12,9 +12,12 @@ defmodule Oscillator.Sine do
     end
   end
 
-  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0) do
+  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
+
+    state = {amplitude, frequency, phase, bias}
+
     {:ok, event_pid} = GenEvent.start_link([])
-    {:ok, pid} = GenServer.start_link(__MODULE__, {{amplitude, frequency, phase}, event_pid})
+    {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
     {:ok, %__MODULE__{server: pid, event: event_pid, input: __MODULE__.InputHandler}}
   end
 
@@ -22,8 +25,8 @@ defmodule Oscillator.Sine do
     GenServer.call(pid, {:get, t})
   end
 
-  def call(input, {amplitude, frequency, phase}) do
-    amplitude * :math.sin(:math.pi * 2 * frequency * input + phase)
+  def call(input, {amplitude, frequency, phase, bias}) do
+    amplitude * :math.sin(:math.pi * 2 * frequency * input + phase) + bias
   end
 
   def handle_call({:get, input}, _from, {state, event_pid}) do

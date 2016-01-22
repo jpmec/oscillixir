@@ -17,9 +17,23 @@ defmodule Oscillator.Square do
     end
   end
 
-  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0) do
+
+  defmodule AmplitudeHandler do
+    use GenEvent
+
+    def handle_event(input, {pid}) do
+      Oscillator.Square.set(pid, {:amplitude, input})
+      {:ok, {pid}}
+    end
+  end
+
+
+  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
+
+    state = {amplitude, frequency, phase}
+
     {:ok, event_pid} = GenEvent.start_link([])
-    {:ok, pid} = GenServer.start_link(__MODULE__, {{amplitude, frequency, phase}, event_pid})
+    {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
     {:ok, %__MODULE__{server: pid, event: event_pid, input: __MODULE__.InputHandler}}
   end
 
@@ -31,7 +45,7 @@ defmodule Oscillator.Square do
     GenServer.call(pid, {:set, input})
   end
 
-  def call(t, {amplitude, frequency, phase}) do
+  def call(t, {amplitude, frequency, phase, bias}) do
     if 0.0 > :math.sin(:math.pi * 2 * frequency * t + phase) do
       -amplitude
     else
@@ -47,15 +61,19 @@ defmodule Oscillator.Square do
     {:reply, output, {state, event_pid}}
   end
 
-  def handle_call({:set, {:a, value}}, _from, {{_, frequency, phase}, event_pid}) do
-    {:reply, :ok, {{value, frequency, phase}, event_pid}}
+  def handle_call({:set, {:amplitude, value}}, _from, {{_, frequency, phase, bias}, event_pid}) do
+    {:reply, :ok, {{value, frequency, phase, bias}, event_pid}}
   end
 
-  def handle_call({:set, {:f, value}}, _from, {{amplitude, _, phase}, event_pid}) do
-    {:reply, :ok, {{amplitude, value, phase}, event_pid}}
+  def handle_call({:set, {:f, value}}, _from, {{amplitude, _, phase, bias}, event_pid}) do
+    {:reply, :ok, {{amplitude, value, phase, bias}, event_pid}}
   end
 
-  def handle_call({:set, {:p, value}}, _from, {{amplitude, frequency, _}, event_pid}) do
-    {:reply, :ok, {{amplitude, frequency, value}, event_pid}}
+  def handle_call({:set, {:p, value}}, _from, {{amplitude, frequency, _, bias}, event_pid}) do
+    {:reply, :ok, {{amplitude, frequency, value, bias}, event_pid}}
+  end
+
+  def handle_call({:set, {:b, value}}, _from, {{amplitude, frequency, phase, _}, event_pid}) do
+    {:reply, :ok, {{amplitude, frequency, value, bias}, event_pid}}
   end
 end

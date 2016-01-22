@@ -14,9 +14,9 @@ defmodule Oscillator.Triangle do
   end
 
 
-  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0) do
+  def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
 
-    state = {amplitude, frequency, phase, 1.0/frequency, phase}
+    state = {amplitude, frequency, phase, 1.0/frequency, phase, bias}
 
     {:ok, event_pid} = GenEvent.start_link([])
     {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
@@ -29,7 +29,7 @@ defmodule Oscillator.Triangle do
   end
 
 
-  def call(input, {amplitude, frequency, phase, period, x}) do
+  def call(input, {amplitude, frequency, phase, bias, period, x}) do
     t = input - x
 
     if (t >= period) do
@@ -40,11 +40,11 @@ defmodule Oscillator.Triangle do
     half_period = period / 2.0
 
     if (t < half_period) do
-      y = -amplitude + (t * 4.0 * amplitude * frequency)
+      y = -amplitude + (t * 4.0 * amplitude * frequency) + bias
       {y, {amplitude, frequency, phase, period, x}}
     else
       t = t - half_period
-      y = amplitude - (t * 4.0 * amplitude * frequency)
+      y = amplitude - (t * 4.0 * amplitude * frequency) + bias
       {y, {amplitude, frequency, phase, period, x}}
     end
   end
