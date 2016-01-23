@@ -2,7 +2,7 @@ defmodule Oscillator.SineTest do
   use ExUnit.Case
   doctest Oscillator.Sine
 
-  test "true is true" do
+  test "sine for 1 tick" do
     import Connect
 
     {:ok, timer} = Source.Timer.new()
