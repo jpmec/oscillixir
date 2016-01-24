@@ -5,16 +5,38 @@ defmodule Oscillixir do
   # A simple example of chaining time source, oscillator, and filters
   def new do
 
-    {:ok, timer} = Source.Timer.new(10)
+    {:ok, timer} = Source.Timer.new()
     {:ok, range} = Sequence.Range.new()
+    {:ok, square} = Oscillator.Square.new(127.0)
+    {:ok, sine} = Oscillator.Sine.new(110.0, 1.0, 0.0, 330.0)
 
     timer |> connect(range)
 
     range
-      |> connect(Oscillator.Triangle.new(127.0))
+      |> connect(sine)
+      |> connect(square, :frequency)
+
+    range
+      |> connect(square)
       |> connect(Filter.Round.new())
       |> connect(Sink.File.new())
-#      |> connect(Sink.Inspect.new())
+
+
+    Source.Timer.start(timer.server)
+
+    # range
+    #   |> connect(sine)
+
+
+ #   range |> connect(Sink.Inspect.new())
+
+
+    # range
+    #   |> connect(Oscillator.Triangle.new(127.0))
+    #   |> connect(Filter.Round.new())
+    #   |> connect(Sink.Inspect.new())
+
+#      |> connect(Sink.File.new())
 
 
     # range
@@ -31,7 +53,7 @@ defmodule Oscillixir do
     #   |> connect(Filter.Round.new())
     #   |> connect(Sink.File.new())
 
-    Source.Timer.start(timer.server)
+    #Source.Timer.start(timer.server)
 
     {:ok}
 

@@ -22,7 +22,7 @@ defmodule Sink.File do
     GenServer.call(pid, {:write, input})
   end
 
-  def handle_call({:write, input}, _from, {{filename}, file_pid}) do
+  def handle_call({:write, {_, input}}, _from, {{filename}, file_pid}) do
 
     :ok = IO.binwrite file_pid, <<input :: size(8)>>
 

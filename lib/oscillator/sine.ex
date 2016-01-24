@@ -4,7 +4,7 @@ defmodule Oscillator.Sine do
 
 
   def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
-    __MODULE__.init {amplitude, frequency, phase, bias}
+    __MODULE__.start_link {amplitude, frequency, phase, bias}
   end
 
 

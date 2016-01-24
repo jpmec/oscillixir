@@ -7,7 +7,7 @@ defmodule Sink.Inspect do
     use GenEvent
 
     def handle_event(input, {pid}) do
-      Sink.Inspect.inspect(pid, input)
+      Sink.Inspect.put(pid, input)
       {:ok, {pid}}
     end
   end
@@ -18,7 +18,7 @@ defmodule Sink.Inspect do
     {:ok, %__MODULE__{server: pid, event: :event_pid, input: __MODULE__.InputHandler}}
   end
 
-  def inspect(pid, input) do
+  def put(pid, input) do
     GenServer.call(pid, {:inspect, input})
   end
 

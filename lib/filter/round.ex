@@ -22,8 +22,8 @@ defmodule Filter.Round do
     GenServer.call(pid, {:get, input})
   end
 
-  def call(input, {}) do
-    round(input)
+  def call({t, input}, {}) do
+    {t, round(input)}
   end
 
   def handle_call({:get, input}, _from, {state, event_pid}) do

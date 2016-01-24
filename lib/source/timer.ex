@@ -75,7 +75,7 @@ defmodule Source.Timer do
 
   def handle_call(:next, _from, {t, interval, increment, tref, event_pid}) do
     t = t + increment
-    GenEvent.notify(event_pid, t)
+    GenEvent.sync_notify(event_pid, t)
     {:reply, t, {t, interval, increment, tref, event_pid}}
   end
 

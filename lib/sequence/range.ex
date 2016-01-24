@@ -26,7 +26,7 @@ defmodule Sequence.Range do
     output = for i <- 0..length-1, do: at + i*increment
     at = List.last(output) + increment
 
-    output |> Enum.each(fn(y) -> GenEvent.notify(event_pid, y) end)
+    output |> Enum.each(fn(y) -> GenEvent.sync_notify(event_pid, y) end)
 
     {:reply, output, {{at, length, increment}, event_pid}}
   end

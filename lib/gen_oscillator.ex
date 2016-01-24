@@ -4,7 +4,7 @@ defmodule GenOscillator do
     quote do
       use GenServer
 
-      defstruct server: :nil, event: :nil, input: :nil
+      defstruct server: :nil, event: :nil, input: :nil, controls: :nil
 
 
       defmodule InputHandler do
@@ -17,15 +17,10 @@ defmodule GenOscillator do
       end
 
 
-      def init(state) do
-        __MODULE__.start_link(state)
-      end
-
-
-      def start_link(state) do
+      def start_link(state, controls \\ :nil) do
         {:ok, event_pid} = GenEvent.start_link([])
         {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
-        {:ok, %__MODULE__{server: pid, event: event_pid, input: __MODULE__.InputHandler}}
+        {:ok, %__MODULE__{server: pid, event: event_pid, input: __MODULE__.InputHandler, controls: controls}}
       end
 
 
@@ -37,7 +32,7 @@ defmodule GenOscillator do
       def handle_call({:get, input}, _from, {state, event_pid}) do
         {output, new_state} = __MODULE__.call(input, state)
 
-        GenEvent.notify(event_pid, output)
+        GenEvent.sync_notify(event_pid, output)
 
         {:reply, output, {new_state, event_pid}}
       end

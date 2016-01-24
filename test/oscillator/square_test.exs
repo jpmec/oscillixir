@@ -14,11 +14,12 @@ defmodule Oscillator.SquareTest do
 
     Source.Timer.tick(timer.server)
 
-    :timer.sleep(1000)
+    :timer.sleep(100)
 
     list = Sink.List.get(sink.server)
 
-    assert 1.0 == Enum.at(list, 0)
+    assert 10 == Enum.count(list)
+    assert {0.0, 1.0} == Enum.at(list, 0)
 
     IO.inspect(list)
   end

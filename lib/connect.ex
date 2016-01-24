@@ -15,8 +15,8 @@ defmodule Connect do
     to
   end
 
-  def connect(from, to, parameter) do
-    :ok = GenEvent.add_handler(from.event, {Map.get(to, parameter), to.server}, {to.server})
+  def connect(from, to, control) do
+    :ok = GenEvent.add_handler(from.event, {Map.get(to.controls, control), to.server}, {to.server})
     to
   end
 

@@ -4,8 +4,14 @@ defmodule Oscillator.Saw do
 
 
   def new(amplitude \\ 1.0, frequency \\ 440.0, phase \\ 0.0, bias \\ 0.0) do
-    period = 1.0/frequency
-    __MODULE__.init {amplitude, frequency, phase, bias, period, phase + period/2.0}
+    period =
+      if (0.0 == frequency) do
+        0.0
+      else
+        1.0/frequency
+      end
+
+    __MODULE__.start_link {amplitude, frequency, phase, bias, period, phase + period/2.0}
   end
 
 
