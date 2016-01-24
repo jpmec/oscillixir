@@ -70,4 +70,47 @@ defmodule Oscillator.SawTest do
     IO.inspect(list)
   end
 
+
+  test "oscillating amplitude and frequency"
+
+
+    {:ok, timer} = Source.Timer.new()
+    {:ok, range} = Sequence.Range.new()
+
+    {:ok, saw} = Oscillator.Saw.new(127.0)
+    {:ok, square} = Oscillator.Square.new(127.0)
+
+    {:ok, frequency_sine} = Oscillator.Sine.new(41.25, 1.0, 0.0, 68.75)
+    {:ok, amplitude_sine} = Oscillator.Sine.new(63.5, 2.0, 0.0, 63.5)
+
+    {:ok, sink} = Sink.List.new()
+
+
+    timer |> connect(range)
+
+    range
+      |> connect(frequency_sine)
+      |> connect(saw, :frequency)
+
+    range
+      |> connect(amplitude_sine)
+      |> connect(saw, :amplitude)
+
+    range
+      |> connect(saw)
+      |> connect(Filter.Round.new())
+      |> connect(sink)
+
+    Source.Timer.tick(timer.server)
+
+    :timer.sleep(1000)
+
+    list = Sink.List.get(sink.server)
+
+    assert 0 == Enum.at(list, 0)
+
+    IO.inspect(list)
+
+  end
+
 end
