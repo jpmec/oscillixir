@@ -1,16 +1,16 @@
-defmodule Oscillator.SquareTest do
+defmodule Oscillator.TriangleTest do
   use ExUnit.Case
-  doctest Oscillator.Square
+  doctest Oscillator.Triangle
 
   test "1 tick" do
     import Connect
 
     {:ok, timer} = Source.Timer.new()
     {:ok, range} = Sequence.Range.new(10)
-    {:ok, square} = Oscillator.Square.new()
+    {:ok, triangle} = Oscillator.Triangle.new()
     {:ok, sink} = Sink.List.new()
 
-    timer |> connect(range) |> connect(square) |> connect(sink)
+    timer |> connect(range) |> connect(triangle) |> connect(sink)
 
     Source.Timer.tick(timer.server)
 
@@ -19,7 +19,7 @@ defmodule Oscillator.SquareTest do
     list = Sink.List.get(sink.server)
 
     assert 10 == Enum.count(list)
-    assert {0.0, 1.0} == Enum.at(list, 0)
+    assert {0.0, 0.0} == Enum.at(list, 0)
 
     IO.inspect(list)
   end
@@ -32,7 +32,7 @@ defmodule Oscillator.SquareTest do
 
     {:ok, timer} = Source.Timer.new()
     {:ok, range} = Sequence.Range.new()
-    {:ok, square} = Oscillator.Square.new(127.0)
+    {:ok, triangle} = Oscillator.Triangle.new(127.0)
     {:ok, frequency_sine} = Oscillator.Sine.new(41.25, 1.0, 0.0, 68.75)
     {:ok, amplitude_sine} = Oscillator.Sine.new(63.5, 2.0, 0.0, 63.5)
 
@@ -40,14 +40,14 @@ defmodule Oscillator.SquareTest do
 
     range
       |> connect(frequency_sine)
-      |> connect(square, :frequency)
+      |> connect(triangle, :frequency)
 
     range
       |> connect(amplitude_sine)
-      |> connect(square, :amplitude)
+      |> connect(triangle, :amplitude)
 
     range
-      |> connect(square)
+      |> connect(triangle)
       |> connect(Filter.Round.new())
       |> connect(Sink.File.new())
 
@@ -58,7 +58,7 @@ defmodule Oscillator.SquareTest do
     list = Sink.List.get(sink.server)
 
     assert 10 == Enum.count(list)
-    assert {0.0, 1.0} == Enum.at(list, 0)
+    assert {0.0, 0.0} == Enum.at(list, 0)
 
     IO.inspect(list)
   end

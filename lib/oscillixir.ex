@@ -10,6 +10,7 @@ defmodule Oscillixir do
 
     {:ok, saw} = Oscillator.Saw.new(127.0)
     {:ok, square} = Oscillator.Square.new(127.0)
+    {:ok, triangle} = Oscillator.Triangle.new(127.0)
 
     {:ok, frequency_sine} = Oscillator.Sine.new(41.25, 1.0, 0.0, 68.75)
     {:ok, amplitude_sine} = Oscillator.Sine.new(63.5, 2.0, 0.0, 63.5)
@@ -19,14 +20,14 @@ defmodule Oscillixir do
 
     range
       |> connect(frequency_sine)
-      |> connect(saw, :frequency)
+      |> connect(triangle, :frequency)
 
     range
       |> connect(amplitude_sine)
-      |> connect(saw, :amplitude)
+      |> connect(triangle, :amplitude)
 
     range
-      |> connect(saw)
+      |> connect(triangle)
       |> connect(Filter.Round.new())
       |> connect(Sink.File.new())
 

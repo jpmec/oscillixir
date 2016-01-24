@@ -54,7 +54,7 @@ defmodule Oscillator.Saw do
       dt = t - x
     end
 
-    half_period = period / 2.0
+    half_period = 0.5 * period
 
     y =
       if (dt < half_period) do
