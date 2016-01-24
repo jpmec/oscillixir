@@ -29,6 +29,11 @@ defmodule GenOscillator do
       end
 
 
+      def inspect(pid) do
+        GenServer.call(pid, :inspect)
+      end
+
+
       def handle_call({:get, input}, _from, {state, event_pid}) do
         {output, new_state} = __MODULE__.call(input, state)
 
@@ -36,6 +41,11 @@ defmodule GenOscillator do
 
         {:reply, output, {new_state, event_pid}}
       end
+
+      def handle_call(:inspect, _from, {state, event_pid}) do
+        {:reply, state, {state, event_pid}}
+      end
+
     end
   end
 
