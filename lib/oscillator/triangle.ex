@@ -28,7 +28,7 @@ defmodule Oscillator.Triangle do
       if (0.0 == frequency) do
         0.0
       else
-        1.0/frequency
+        1.0 / frequency
       end
 
     __MODULE__.start_link(
@@ -68,26 +68,16 @@ defmodule Oscillator.Triangle do
         -amplitude + (dt * 4.0 * amplitude * frequency) + bias
     end
 
-    # if (t < half_period) do
-    #   y = -amplitude + (t * 4.0 * amplitude * frequency) + bias
-    #   {y, {amplitude, frequency, phase, bias, period, x}}
-    # else
-    #   t = t - half_period
-    #   y = amplitude - (t * 4.0 * amplitude * frequency) + bias
-    #   {y, {amplitude, frequency, phase, bias, period, x}}
-    # end
-
     {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
-
   end
 
 
-  def handle_call({:set, {:amplitude, value}}, _from, {{_, frequency, phase, bias, period, x, y}, event_pid}) do
+  def handle_call({:set, {:amplitude, {t, value}}}, _from, {{_, frequency, phase, bias, period, x, y}, event_pid}) do
     {:reply, :ok, {{value, frequency, phase, bias, period, x, y}, event_pid}}
   end
 
 
-  def handle_call({:set, {:frequency, value}}, _from, {{amplitude, _, phase, bias, _, x, y}, event_pid}) do
+  def handle_call({:set, {:frequency, {t, value}}}, _from, {{amplitude, _, phase, bias, _, x, y}, event_pid}) do
     new_period =
       if (0.0 == value) do
         0.0
