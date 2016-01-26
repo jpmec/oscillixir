@@ -34,7 +34,7 @@ defmodule Oscillator.Square do
         -amplitude + bias
     end
 
-    {{t, }, {amplitude, frequency, phase, bias, period, x, y}}
+    {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
   end
 
 end
