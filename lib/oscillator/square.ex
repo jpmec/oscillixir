@@ -11,15 +11,24 @@ defmodule Oscillator.Square do
         1.0 / frequency
       end
 
-    __MODULE__.start_link {amplitude, frequency, phase, bias, period, 0.0, 1 + bias}
+    __MODULE__.start_link(
+      {0.0, 1.0 + bias},
+      %Control{
+        amplitude: amplitude,
+        frequency: frequency,
+        phase: phase,
+        bias: bias,
+        period: period
+      }
+    )
   end
 
 
-  def call(t, {amplitude, frequency, phase, bias, period, x, y}) do
+  def call(t, {x, y}, control) do
     dt = t - x
 
-    if (period < dt) do
-      x = x + period
+    if (control.period < dt) do
+      x = x + control.period
       if 0 < y do
         y = -1
       else
@@ -29,12 +38,12 @@ defmodule Oscillator.Square do
 
     y =
       if 0.0 < y do
-        amplitude + bias
+        control.amplitude + control.bias
       else
-        -amplitude + bias
+        -control.amplitude + control.bias
     end
 
-    {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
+    {{t, y}, {x, y}}
   end
 
 end
