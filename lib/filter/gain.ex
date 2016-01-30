@@ -45,8 +45,8 @@ defmodule Filter.Gain do
     GenServer.call(pid, :inspect)
   end
 
-  def call(input, {gain}) do
-    input * gain
+  def call({t, input}, {gain}) do
+    {t, input * gain}
   end
 
   def handle_call(:inspect, _from, state) do
