@@ -11,21 +11,30 @@ defmodule Oscillator.Sine do
         1.0 / frequency
       end
 
-    __MODULE__.start_link {amplitude, frequency, phase, bias, period, 0.0, bias}
+    __MODULE__.start_link(
+      {0.0, amplitude + bias},
+      %Control{
+        amplitude: amplitude,
+        frequency: frequency,
+        phase: phase,
+        bias: bias,
+        period: period
+      }
+    )
   end
 
 
-  def call(t, {amplitude, frequency, phase, bias, period, x, y}) do
+  def call(t, {x, y}, control) do
     dt = t - x
 
-    if (period < dt) do
-      x = x + period
-      dt = t - x
+    if (control.period < dt) do
+     x = x + control.period
+     dt = t - x
     end
 
-    y = amplitude * :math.sin(:math.pi * 2 * frequency * dt + phase) + bias
+    y = control.amplitude * :math.sin(:math.pi * 2 * control.frequency * dt + control.phase) + control.bias
 
-    {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
+    {{t, y}, {x, y}}
   end
 
 end

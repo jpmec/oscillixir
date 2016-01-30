@@ -4,6 +4,10 @@ defmodule GenOscillator do
     quote do
       use GenServer
 
+      defmodule Control do
+        defstruct amplitude: :nil, frequency: :nil, phase: :nil, bias: :nil, period: :nil
+      end
+
       defstruct server: :nil, event: :nil, input: :nil, controls: :nil
 
 
@@ -37,9 +41,9 @@ defmodule GenOscillator do
       end
 
 
-      def start_link(state) do
+      def start_link(state, control) do
         {:ok, event_pid} = GenEvent.start_link([])
-        {:ok, pid} = GenServer.start_link(__MODULE__, {state, event_pid})
+        {:ok, pid} = GenServer.start_link(__MODULE__, {state, control, event_pid})
         {:ok, %__MODULE__{
           server: pid,
           event: event_pid,
@@ -67,12 +71,12 @@ defmodule GenOscillator do
       end
 
 
-      def handle_call({:get, input}, _from, {state, event_pid}) do
-        {output, new_state} = __MODULE__.call(input, state)
+      def handle_call({:get, input}, _from, {state, control, event_pid}) do
+        {output, new_state} = __MODULE__.call(input, state, control)
 
         GenEvent.sync_notify(event_pid, output)
 
-        {:reply, output, {new_state, event_pid}}
+        {:reply, output, {new_state, control, event_pid}}
       end
 
 
@@ -81,20 +85,20 @@ defmodule GenOscillator do
       end
 
 
-      def handle_call({:set, {:amplitude, {t, value}}}, _from, {{_, frequency, phase, bias, period, x, y}, event_pid}) do
-        {:reply, :ok, {{value, frequency, phase, bias, period, x, y}, event_pid}}
+      def handle_call({:set, {:amplitude, {t, value}}}, _from, {state, control, event_pid}) do
+        {:reply, :ok, {state, %{control | amplitude: value}, event_pid}}
       end
 
 
-      def handle_call({:set, {:frequency, {t, value}}}, _from, {{amplitude, _, phase, bias, _, x, y}, event_pid}) do
-        new_period =
+      def handle_call({:set, {:frequency, {t, value}}}, _from, {state, control, event_pid}) do
+        period =
           if (0.0 == value) do
             0.0
           else
             1.0/value
           end
 
-        {:reply, :ok, {{amplitude, value, phase, bias, new_period, x, y}, event_pid}}
+        {:reply, :ok, {state, %{control | frequency: value, period: period}, event_pid}}
       end
 
     end

@@ -11,21 +11,32 @@ defmodule Oscillator.Impulse do
         1.0 / frequency
       end
 
-    __MODULE__.start_link {amplitude, frequency, phase, bias, period, 0.0, bias}
+    __MODULE__.start_link(
+      {0.0, 0.0},
+      %Control{
+        amplitude: amplitude,
+        frequency: frequency,
+        phase: phase,
+        bias: bias,
+        period: period
+      }
+    )
   end
 
 
-  def call(t, {amplitude, frequency, phase, bias, period, x, y}) do
+  def call(t, {x, _}, control) do
     dt = t - x
 
-    if (period < dt) do
-      x = x + period
-      y = amplitude + bias
-    else
-      y = bias
-    end
+    y =
+      cond do
+        (control.period < dt) ->
+          x = x + control.period
+          control.amplitude + control.bias
+        true->
+          control.bias
+      end
 
-    {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
+    {{t, y}, {x, y}}
   end
 
 end

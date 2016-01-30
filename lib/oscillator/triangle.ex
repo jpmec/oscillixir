@@ -11,33 +11,42 @@ defmodule Oscillator.Triangle do
         1.0 / frequency
       end
 
-    __MODULE__.start_link {amplitude, frequency, phase, bias, period, 0.0, bias}
+    __MODULE__.start_link(
+      {0.0, bias},
+      %Control{
+        amplitude: amplitude,
+        frequency: frequency,
+        phase: phase,
+        bias: bias,
+        period: period
+      }
+    )
   end
 
 
-  def call(t, {amplitude, frequency, phase, bias, period, x, y}) do
+  def call(t, {x, y}, control) do
     dt = t - x
 
-    if (period < dt) do
-      x = x + period
+    if (control.period < dt) do
+      x = x + control.period
       dt = t - x
     end
 
-    one_quarter_period = 0.25 * period
-    three_quarter_period = 0.75 * period
+    one_quarter_period = 0.25 * control.period
+    three_quarter_period = 0.75 * control.period
 
     y = cond do
       dt < one_quarter_period ->
-        (dt * 4.0 * amplitude * frequency) + bias
+        (dt * 4.0 * control.amplitude * control.frequency) + control.bias
       dt < three_quarter_period ->
         dt = dt - one_quarter_period
-        amplitude - (dt * 4.0 * amplitude * frequency) + bias
+        control.amplitude - (dt * 4.0 * control.amplitude * control.frequency) + control.bias
       true ->
         dt = dt - three_quarter_period
-        -amplitude + (dt * 4.0 * amplitude * frequency) + bias
+        -control.amplitude + (dt * 4.0 * control.amplitude * control.frequency) + control.bias
     end
 
-    {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
+    {{t, y}, {x, y}}
   end
 
 end

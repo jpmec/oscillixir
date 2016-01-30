@@ -11,29 +11,38 @@ defmodule Oscillator.Saw do
         1.0 / frequency
       end
 
-    __MODULE__.start_link {amplitude, frequency, phase, bias, period, 0.0, bias}
+    __MODULE__.start_link(
+      {0.0, bias},
+      %Control{
+        amplitude: amplitude,
+        frequency: frequency,
+        phase: phase,
+        bias: bias,
+        period: period
+      }
+    )
   end
 
 
-  def call(t, {amplitude, frequency, phase, bias, period, x, y}) do
+  def call(t, {x, y}, control) do
     dt = t - x
 
-    if (period < dt) do
-      x = x + period
+    if (control.period < dt) do
+      x = x + control.period
       dt = t - x
     end
 
-    half_period = 0.5 * period
+    half_period = 0.5 * control.period
 
     y =
       if (dt < half_period) do
-        (dt * 2.0 * amplitude * frequency) + bias
+        (dt * 2.0 * control.amplitude * control.frequency) + control.bias
       else
         dt = dt - half_period
-        -amplitude + (dt * 2.0 * amplitude * frequency) + bias
+        -control.amplitude + (dt * 2.0 * control.amplitude * control.frequency) + control.bias
       end
 
-    {{t, y}, {amplitude, frequency, phase, bias, period, x, y}}
+    {{t, y}, {x, y}}
   end
 
 end

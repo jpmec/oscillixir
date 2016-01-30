@@ -12,7 +12,7 @@ defmodule Oscillator.Square do
       end
 
     __MODULE__.start_link(
-      {0.0, 1.0 + bias},
+      {0.0, amplitude + bias},
       %Control{
         amplitude: amplitude,
         frequency: frequency,
