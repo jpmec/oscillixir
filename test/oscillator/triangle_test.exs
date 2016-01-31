@@ -45,6 +45,30 @@ defmodule Oscillator.TriangleTest do
   end
 
 
+  test "440" do
+    import Connect
+
+    {:ok, timer} = Source.Timer.new()
+    {:ok, range} = Sequence.Range.new()
+    {:ok, triangle} = Oscillator.Triangle.new(1.0, 440.0)
+
+    timer
+      |> connect(range)
+      |> connect(triangle)
+      |> connect(Filter.Gain.new(100.0))
+      |> connect(Filter.Round.new())
+      |> connect(Sink.File.new("triangle_test_440.pcm"))
+
+    Source.Timer.start(timer.server)
+    :timer.sleep(1000)
+    Source.Timer.stop(timer.server)
+    :timer.sleep(1000)
+  end
+
+
+
+
+
   # test "control frequency and amplitude" do
   #   import Connect
 

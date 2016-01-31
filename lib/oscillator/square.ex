@@ -27,17 +27,14 @@ defmodule Oscillator.Square do
   def call(t, {x, y}, control) do
     dt = t - x
 
-    if (control.period < dt) do
+    if control.period < dt do
       x = x + control.period
-      if 0 < y do
-        y = -1
-      else
-        y = 1
-      end
     end
 
+    half_period = 0.5 * control.period
+
     y =
-      if 0.0 < y do
+      if dt < half_period do
         control.amplitude + control.bias
       else
         -control.amplitude + control.bias
