@@ -1,18 +1,20 @@
 defmodule Connect do
 
-  def connect({:ok, from}, to) do
-    :ok = GenEvent.add_handler(from.event, {to.input, to.server}, {to.server})
+  def connect_event(event, to) do
+    :ok = GenEvent.add_handler(event, {to.input, to.server}, {to.server})
     to
+  end
+
+  def connect({:ok, from}, to) do
+    connect_event(from.event, to)
   end
 
   def connect(from, {:ok, to}) do
-    :ok = GenEvent.add_handler(from.event, {to.input, to.server}, {to.server})
-    to
+    connect_event(from.event, to)
   end
 
   def connect(from, to) do
-    :ok = GenEvent.add_handler(from.event, {to.input, to.server}, {to.server})
-    to
+    connect_event(from.event, to)
   end
 
   def connect(from, to, control) do
