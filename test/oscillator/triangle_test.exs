@@ -36,7 +36,7 @@ defmodule Oscillator.TriangleTest do
       |> connect(range)
       |> connect(triangle)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("triangle_test_constant.pcm"))
+      |> connect(Sink.File.new("temp/test/oscillator/triangle_test_constant.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)
@@ -57,7 +57,7 @@ defmodule Oscillator.TriangleTest do
       |> connect(triangle)
       |> connect(Filter.Gain.new(100.0))
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("triangle_test_440.pcm"))
+      |> connect(Sink.File.new("temp/test/oscillator/triangle_test_440.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)

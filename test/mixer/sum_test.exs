@@ -21,7 +21,7 @@ defmodule Mixer.SumTest do
 
     sum
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("sum_test_simple.pcm"))
+      |> connect(Sink.File.new("temp/test/mixer/sum_test_simple.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)

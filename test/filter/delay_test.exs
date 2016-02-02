@@ -16,7 +16,7 @@ defmodule Mixer.DelayTest do
       |> connect(impulse)
       |> connect(delay)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("delay_test_simple.pcm"))
+      |> connect(Sink.File.new("temp/test/filter/delay_test_simple.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)

@@ -15,7 +15,7 @@ defmodule Filter.PidTest do
       |> connect(impulse)
       |> connect(pid)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("pid_test_impulse.pcm"))
+      |> connect(Sink.File.new("temp/test/filter/pid_test_impulse.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)
@@ -36,7 +36,7 @@ defmodule Filter.PidTest do
       |> connect(square)
       |> connect(pid)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("pid_test_square.pcm"))
+      |> connect(Sink.File.new("temp/test/filter/pid_test_square.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)

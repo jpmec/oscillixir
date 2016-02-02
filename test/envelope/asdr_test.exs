@@ -1,6 +1,6 @@
-defmodule Oscillator.SquareTest do
+defmodule Envelope.AsdrTest do
   use ExUnit.Case
-  doctest Oscillator.Square
+  doctest Envelope.Asdr
 
 
   test "simple" do
@@ -22,14 +22,11 @@ defmodule Oscillator.SquareTest do
     range
       |> connect(square)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new('adsr_test.pcm'))
+      |> connect(Sink.File.new("temp/test/envelope/adsr_test_simple.pcm"))
 
     Source.Timer.start(timer.server)
-
     :timer.sleep(1000)
-
     Source.Timer.stop(timer.server)
-
   end
 
 end

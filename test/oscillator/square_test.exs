@@ -37,7 +37,7 @@ defmodule Oscillator.SquareTest do
       |> connect(square)
       |> connect(Filter.Gain.new(100.0))
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("square_test_440.pcm"))
+      |> connect(Sink.File.new("temp/test/oscillator/square_test_440.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)
@@ -69,7 +69,7 @@ defmodule Oscillator.SquareTest do
     range
       |> connect(square)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("square_test_control_frequency_and_amplitude.pcm"))
+      |> connect(Sink.File.new("temp/test/oscillator/square_test_control_frequency_and_amplitude.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)

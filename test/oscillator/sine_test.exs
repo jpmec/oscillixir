@@ -33,7 +33,7 @@ defmodule Oscillator.SineTest do
       |> connect(range)
       |> connect(sine)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("sine_test_constant.pcm"))
+      |> connect(Sink.File.new("temp/test/oscillator/sine_test_constant.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)

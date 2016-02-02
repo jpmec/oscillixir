@@ -15,7 +15,7 @@ defmodule Filter.GateTest do
       |> connect(impulse)
       |> connect(gate)
       |> connect(Filter.Round.new())
-      |> connect(Sink.File.new("gate_test_sine.pcm"))
+      |> connect(Sink.File.new("temp/test/filter/gate_test_sine.pcm"))
 
     Source.Timer.start(timer.server)
     :timer.sleep(1000)
