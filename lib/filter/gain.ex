@@ -1,7 +1,11 @@
 defmodule Filter.Gain do
   use GenServer
 
-  defstruct server: :nil, event: :nil, input: :nil, gain: :nil
+  defmodule Control do
+    defstruct gain: :nil
+  end
+
+  defstruct server: :nil, event: :nil, input: :nil, controls: :nil
 
   defmodule InputHandler do
     use GenEvent
@@ -23,13 +27,23 @@ defmodule Filter.Gain do
 
 
   def new(gain \\ 1.0) do
+
+    state = :nil
+
+    control = %Control{
+      gain: gain
+    }
+
     {:ok, event_pid} = GenEvent.start_link([])
-    {:ok, pid} = GenServer.start_link(__MODULE__, {{gain}, event_pid})
+    {:ok, pid} = GenServer.start_link(__MODULE__, {state, control, event_pid})
     {:ok, %__MODULE__{
       server: pid,
       event: event_pid,
       input: __MODULE__.InputHandler,
-      gain: __MODULE__.GainHandler
+      controls: %{
+        gain: __MODULE__.GainHandler
+      }
+
     }}
   end
 
@@ -45,21 +59,19 @@ defmodule Filter.Gain do
     GenServer.call(pid, :inspect)
   end
 
-  def call({t, input}, {gain}) do
-    {t, input * gain}
+  def call({t, input}, state, control) do
+    {{t, input * control.gain}, state}
   end
 
-  def handle_call(:inspect, _from, state) do
-    {:reply, {:ok, state}, state}
+  def handle_call({:get, input}, _from, {state, control, event_pid}) do
+    {output, new_state} = __MODULE__.call(input, state, control)
+
+    GenEvent.sync_notify(event_pid, output)
+
+    {:reply, output, {new_state, control, event_pid}}
   end
 
-  def handle_call({:get, input}, _from, {state, event_pid}) do
-    output = __MODULE__.call(input, state)
-    GenEvent.notify(event_pid, output)
-    {:reply, output, {state, event_pid}}
-  end
-
-  def handle_call({:set, {:gain, value}}, _from, {{_}, event_pid}) do
-    {:reply, :ok, {{value}, event_pid}}
+  def handle_call({:set, {:gain, {t, value}}}, _from, {state, control, event_pid}) do
+    {:reply, :ok, {state, %{control | gain: value}, event_pid}}
   end
 end
