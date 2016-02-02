@@ -12,9 +12,9 @@ defmodule Sink.File do
     end
   end
 
-  def new(filename \\ "file.pcm") do
+  def new(filename \\ "file.pcm", bits \\ 8) do
     {:ok, file_pid} = File.open(filename, [:write])
-    {:ok, pid} = GenServer.start_link(__MODULE__, {{filename}, file_pid})
+    {:ok, pid} = GenServer.start_link(__MODULE__, {{filename, bits}, file_pid})
     {:ok, %__MODULE__{server: pid, file: file_pid, input: __MODULE__.InputHandler}}
   end
 
@@ -22,11 +22,9 @@ defmodule Sink.File do
     GenServer.call(pid, {:write, input})
   end
 
-  def handle_call({:write, {_, input}}, _from, {{filename}, file_pid}) do
-
-    :ok = IO.binwrite file_pid, <<input :: size(8)>>
-
-    {:reply, :ok, {{filename}, file_pid}}
+  def handle_call({:write, {_, input}}, _from, {{filename, bits}, file_pid}) do
+    :ok = IO.binwrite file_pid, <<input :: size(bits)>>
+    {:reply, :ok, {{filename, bits}, file_pid}}
   end
 
 end
