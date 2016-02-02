@@ -24,6 +24,11 @@ defmodule Oscillator.Sine do
   end
 
 
+  def call({t, _}, state, control) do
+    call(t, state, control)
+  end
+
+
   def call(t, {x, y}, control) do
     dt = t - x
 

@@ -29,7 +29,9 @@ defmodule Oscillator.Impulse do
 
     y =
       cond do
-        (control.period < dt) ->
+        dt == 0 ->
+          control.amplitude + control.bias
+        control.period < dt ->
           x = x + control.period
           control.amplitude + control.bias
         true->
