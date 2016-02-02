@@ -31,7 +31,6 @@ defmodule GenMixer do
       end
 
 
-
       def start_link(state, control) do
         {:ok, event_pid} = GenEvent.start_link([])
         {:ok, pid} = GenServer.start_link(__MODULE__, {state, control, event_pid})
@@ -72,7 +71,7 @@ defmodule GenMixer do
       end
 
 
-      def handle_call(:inspect, _from, {state, event_pid}) do
+      def handle_call(:inspect, _from, {state, control, event_pid}) do
         {:reply, state, {state, event_pid}}
       end
 

@@ -21,7 +21,7 @@ defmodule Mixer.Product do
     values = Dict.get new_state, t
 
     if control.channel_count == Enum.count(values) do
-        output = values |> Enum.reduce 1.0, fn(x, acc) -> x * acc end
+        output = values |> Enum.reduce(1.0, fn(x, acc) -> x * acc end)
         new_state = Dict.delete new_state, t
         {{t, output}, new_state}
     else
